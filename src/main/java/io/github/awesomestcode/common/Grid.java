@@ -47,8 +47,17 @@ public class Grid {
         }
     }
 
+    public void clearPathStates() {
+        for(int i = 0; i < pointsWide; i++) {
+            for(int j = 0; j < pointsTall; j++) {
+                if(grid[i][j].isPartOfPath()) {
+                    grid[i][j].setState(GridPointState.UNBLOCKED);
+                }
+            }
+        }
+    }
+
     public enum GridPointState {
-        ACTIVE,
         UNBLOCKED,
         BLOCKED,
         START,
@@ -63,6 +72,16 @@ public class Grid {
         private final int x;
         private final int y;
         private GridPointState state = GridPointState.UNBLOCKED;
+
+        private boolean active;
+
+        public boolean isActive() {
+            return active;
+        }
+
+        public void setActive(boolean active) {
+            this.active = active;
+        }
 
         public int getX() {
             return x;

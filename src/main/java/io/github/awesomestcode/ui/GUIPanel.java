@@ -1,17 +1,18 @@
 package io.github.awesomestcode.ui;
 
+import io.github.awesomestcode.Main;
 import io.github.awesomestcode.common.Grid;
+import io.github.awesomestcode.compute.Pathfinder;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.BiPredicate;
+
+import static io.github.awesomestcode.ui.PaintUtil.paintPath;
 
 public class GUIPanel extends JPanel {
 
@@ -22,6 +23,7 @@ public class GUIPanel extends JPanel {
     private final BiPredicate<Integer, Integer> isBlocked;
 
     private final Grid grid;
+    private Pathfinder.Path path;
 
     {
         try {
@@ -49,6 +51,34 @@ public class GUIPanel extends JPanel {
             }
         });
 
+        addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // if it's "S", change the start position to the currently active node
+                if(e.getKeyCode() == KeyEvent.VK_S) { //TODO: clean this code up a bit
+                    Main.setStartX(grid.getNearestGridPoint((MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x), (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y)).getX());
+                    Main.setStartY(grid.getNearestGridPoint((MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x), (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y)).getY());
+                }
+                System.out.println("key pressed: " + e.getKeyCode());
+
+                // if it's "E" change the end position to the currently active node
+                if(e.getKeyCode() == KeyEvent.VK_E) {
+                    Main.setEndX(grid.getNearestGridPoint((MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x), (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y)).getX());
+                    Main.setEndY(grid.getNearestGridPoint((MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x), (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y)).getY());
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
+
         int delay = 30; //milliseconds
         ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -71,12 +101,19 @@ public class GUIPanel extends JPanel {
 
         Grid.GridPoint gp = grid.getNearestGridPoint((location.x - this.getLocationOnScreen().x), (location.y - this.getLocationOnScreen().y));
         if(gp != null) {
-            gp.setState(Grid.GridPointState.ACTIVE);
+            gp.setActive(true);
             //System.out.println("x: " + gp.x + " y: " + gp.y);
         }
 
         refreshEllipses(g);
+        if(path != null) paintPath(path, grid, g);
+        this.requestFocus();
 
+    }
+
+    public void setPath(Pathfinder.Path path) {
+        if(path == null) return;
+        this.path = path;
     }
 
     private void refreshEllipses(Graphics g) {
@@ -90,6 +127,7 @@ public class GUIPanel extends JPanel {
                 } else if(!points[i][j].isPartOfPath()){
                     points[i][j].setState(Grid.GridPointState.UNBLOCKED);
                 }
+                points[i][j].setActive(false);
             }
         }
     }
