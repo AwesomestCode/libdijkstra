@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 
 public class Main {
     static GUIPanel panel = null;
-    private static final int GRID_SIZE = 96;
+    private static final int GRID_SIZE = 24;
     private static int startX = 0;
     private static int startY = 0;
     private static int endX = GRID_SIZE - 1;
@@ -71,7 +71,7 @@ public class Main {
 
     private static boolean isBlocked(int x, int y) {
         // check if in circle of radius 10 of 10, 10
-        if(Math.sqrt(Math.pow(x - 20, 2) + Math.pow(y - 20, 2)) <= 5) {
+        if(Math.sqrt(Math.pow(x - 10, 2) + Math.pow(y - 10, 2)) <= 3) {
             return true;
         }
         return false;

@@ -49,7 +49,7 @@ public class PaintUtil  {
      * @param path
      */
     public static void paintPath(Pathfinder.Path path, Grid grid, Graphics g) { //TODO: refactor to use a shared commons path instead of Pathfinder Path
-        g.setColor(Color.BLUE);
+        g.setColor(Color.CYAN);
 
         while(path.parent != null) {
             //System.out.println("x: " + path.x + " y: " + path.y);

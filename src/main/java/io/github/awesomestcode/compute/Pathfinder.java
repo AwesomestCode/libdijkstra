@@ -3,6 +3,7 @@ package io.github.awesomestcode.compute;
 import io.github.awesomestcode.common.Grid;
 
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
@@ -12,7 +13,7 @@ public class Pathfinder {
 
     public static Path search(int startX, int startY, int endX, int endY, Grid grid) {
         boolean[][] visited = new boolean[grid.getPointsWide()][grid.getPointsTall()];
-        Queue<Path> moves = new LinkedList<>();
+        PriorityQueue<Path> moves = new PriorityQueue<>();
         moves.add(new Path(startX, startY, 0, null));
         while(!moves.isEmpty()) {
             Path move = moves.poll();
@@ -60,25 +61,25 @@ public class Pathfinder {
             }
             if(move.x > 0 && move.y > 0) {
                 if(!visited[move.x - 1][move.y - 1]) {
-                    moves.add(new Path(move.x - 1, move.y - 1, move.cost + 1, move));
+                    moves.add(new Path(move.x - 1, move.y - 1, move.cost + Math.sqrt(2.0d), move));
                     visited[move.x - 1][move.y - 1] = true;
                 }
             }
             if(move.x + 1 < grid.getPointsWide() && move.y > 0) {
                 if(!visited[move.x + 1][move.y - 1]) {
-                    moves.add(new Path(move.x + 1, move.y - 1, move.cost + 1, move));
+                    moves.add(new Path(move.x + 1, move.y - 1, move.cost + Math.sqrt(2.0d), move));
                     visited[move.x + 1][move.y - 1] = true;
                 }
             }
             if(move.x > 0 && move.y + 1 < grid.getPointsTall()) {
                 if(!visited[move.x - 1][move.y + 1]) {
-                    moves.add(new Path(move.x - 1, move.y + 1, move.cost + 1, move));
+                    moves.add(new Path(move.x - 1, move.y + 1, move.cost + Math.sqrt(2.0d), move));
                     visited[move.x - 1][move.y + 1] = true;
                 }
             }
             if(move.x + 1 < grid.getPointsWide() && move.y + 1 < grid.getPointsTall()) {
                 if(!visited[move.x + 1][move.y + 1]) {
-                    moves.add(new Path(move.x + 1, move.y + 1, move.cost + 1, move));
+                    moves.add(new Path(move.x + 1, move.y + 1, move.cost + Math.sqrt(2.0d), move));
                     visited[move.x + 1][move.y + 1] = true;
                 }
             }
@@ -86,16 +87,21 @@ public class Pathfinder {
         throw new RuntimeException("no path found");
     }
 
-    public static class Path {
+    public static class Path implements Comparable<Path>{
         public int x;
         public int y;
-        public int cost;
+        public double cost;
         public Path parent;
-        public Path(int x, int y, int cost, Path parent) {
+        public Path(int x, int y, double cost, Path parent) {
             this.x = x;
             this.y = y;
             this.cost = cost;
             this.parent = parent;
+        }
+
+        @Override
+        public int compareTo(Path o) {
+            return Double.compare(cost, o.cost); //TODO: make it equals-consistent
         }
     }
 }
