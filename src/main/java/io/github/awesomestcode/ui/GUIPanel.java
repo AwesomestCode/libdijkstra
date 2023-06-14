@@ -61,15 +61,25 @@ public class GUIPanel extends JPanel {
             public void keyPressed(KeyEvent e) {
                 // if it's "S", change the start position to the currently active node
                 if(e.getKeyCode() == KeyEvent.VK_S) { //TODO: clean this code up a bit
-                    Main.setStartX(grid.getNearestGridPoint((MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x), (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y)).getX());
-                    Main.setStartY(grid.getNearestGridPoint((MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x), (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y)).getY());
+                    Grid.GridPoint nearestGridPoint = grid.getNearestGridPoint(
+                            (MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x),
+                            (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y));
+                    Main.setStartXY(
+                            nearestGridPoint.getX(),
+                            nearestGridPoint.getY()
+                    );
                 }
                 System.out.println("key pressed: " + e.getKeyCode());
 
                 // if it's "E" change the end position to the currently active node
                 if(e.getKeyCode() == KeyEvent.VK_E) {
-                    Main.setEndX(grid.getNearestGridPoint((MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x), (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y)).getX());
-                    Main.setEndY(grid.getNearestGridPoint((MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x), (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y)).getY());
+                    Grid.GridPoint nearestGridPoint = grid.getNearestGridPoint(
+                            (MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x),
+                            (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y));
+                    Main.setEndXY(
+                            nearestGridPoint.getX(),
+                            nearestGridPoint.getY()
+                    );
                 }
             }
 

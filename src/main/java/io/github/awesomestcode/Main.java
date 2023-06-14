@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 
 public class Main {
     static GUIPanel panel = null;
-    private static final int GRID_SIZE = 24;
+    private static final int GRID_SIZE = 6 * 64;
     private static int startX = 0;
     private static int startY = 0;
     private static int endX = GRID_SIZE - 1;
@@ -34,9 +34,10 @@ public class Main {
                 }
             }
         }
-        createAndShowGUI();
+        //createAndShowGUI();
+
         Pathfinder.Path path = Pathfinder.search(startX, startY, endX, endY, grid);
-        panel.setPath(path);
+        //panel.setPath(path);
         //todo: trigger repaint
 
     }
@@ -63,6 +64,22 @@ public class Main {
     }
 
     public static void setEndY(int endY) {
+        Main.endY = endY;
+        grid.clearPathStates();
+        Pathfinder.Path path = Pathfinder.search(startX, startY, endX, endY, grid);
+        panel.setPath(path);
+    }
+
+    public static void setStartXY(int startX, int startY) {
+        Main.startX = startX;
+        Main.startY = startY;
+        grid.clearPathStates();
+        Pathfinder.Path path = Pathfinder.search(startX, startY, endX, endY, grid);
+        panel.setPath(path);
+    }
+
+    public static void setEndXY(int endX, int endY) {
+        Main.endX = endX;
         Main.endY = endY;
         grid.clearPathStates();
         Pathfinder.Path path = Pathfinder.search(startX, startY, endX, endY, grid);

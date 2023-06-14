@@ -1,22 +1,55 @@
 package io.github.awesomestcode.compute;
 
 import io.github.awesomestcode.common.Grid;
+import io.github.awesomestcode.ui.RobotTranslation;
 
-import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.function.BiPredicate;
-import java.util.function.BooleanSupplier;
 
 public class Pathfinder {
-    // every single node is connected to the ones immediately adjacent incl. diagonals
+
+    final static RobotTranslation[] validTranslations = {
+            /* UNIT TRANSLATIONS */
+            new RobotTranslation(0, 1, 1),
+            new RobotTranslation(0, -1, 1),
+            new RobotTranslation(1, 0, 1),
+            new RobotTranslation(-1, 0, 1),
+            new RobotTranslation(1, 1, Math.sqrt(2)),
+            new RobotTranslation(1, -1, Math.sqrt(2)),
+            new RobotTranslation(-1, 1, Math.sqrt(2)),
+            new RobotTranslation(-1, -1, Math.sqrt(2)),
+
+            /* 2X1 TRANSLATIONS */
+            new RobotTranslation(1, 2, Math.sqrt(5)+ 0.01),
+            new RobotTranslation(1, -2, Math.sqrt(5)+ 0.01),
+            new RobotTranslation(-1, 2, Math.sqrt(5)+ 0.01),
+            new RobotTranslation(-1, -2, Math.sqrt(5)+ 0.01),
+            new RobotTranslation(2, 1, Math.sqrt(5)+ 0.01),
+            new RobotTranslation(2, -1, Math.sqrt(5)+ 0.01),
+            new RobotTranslation(-2, 1, Math.sqrt(5)+ 0.01),
+            new RobotTranslation(-2, -1, Math.sqrt(5)+ 0.01),
+
+            /* 2X3 TRANSLATIONS */
+            /*new RobotTranslation(2, 3, Math.sqrt(13) + 0.01),
+            new RobotTranslation(2, -3, Math.sqrt(13)+ 0.01),
+            new RobotTranslation(-2, 3, Math.sqrt(13)+ 0.01),
+            new RobotTranslation(-2, -3, Math.sqrt(13)+ 0.01),
+            new RobotTranslation(3, 2, Math.sqrt(13)+ 0.01),
+            new RobotTranslation(3, -2, Math.sqrt(13)+ 0.01),
+            new RobotTranslation(-3, 2, Math.sqrt(13)+ 0.01),
+            new RobotTranslation(-3, -2, Math.sqrt(13)+ 0.01),*/
+    };
 
     public static Path search(int startX, int startY, int endX, int endY, Grid grid) {
+        long startTime = System.currentTimeMillis();
         boolean[][] visited = new boolean[grid.getPointsWide()][grid.getPointsTall()];
+        //visited[startX][startY] = true;
         PriorityQueue<Path> moves = new PriorityQueue<>();
         moves.add(new Path(startX, startY, 0, null));
         while(!moves.isEmpty()) {
             Path move = moves.poll();
+
+            if(visited[move.x][move.y]) continue;
+            visited[move.x][move.y] = true;
             //System.out.println("Checking x: " + move.x + " y: " + move.y + " cost: " + move.cost);
             if(grid.getGrid()[move.x][move.y].getState() == Grid.GridPointState.BLOCKED) {
                 //System.out.println("blocked");
@@ -24,63 +57,51 @@ public class Pathfinder {
             }
             if(move.x == endX && move.y == endY) {
                 // found the end
-                System.out.println("found the end");
+                System.out.println("Path found in " + (System.currentTimeMillis() - startTime) + "ms");
                 Path current = move;
                 while(current != null) {
-                    System.out.println("x: " + current.x + " y: " + current.y);
+                    //System.out.println("x: " + current.x + " y: " + current.y);
                     grid.getGrid()[current.x][current.y].setState(Grid.GridPointState.PATH);
                     current = current.parent;
                 }
                 return move;
             }
+            // calculate inertial heading by using current position and position two lattice points ago
+            /*Path lastCheckedHeadingLookbackMove = move.parent;
+
+            int inertialHeading = Integer.MIN_VALUE;
+            if(lastCheckedHeadingLookbackMove != null && lastCheckedHeadingLookbackMove.parent != null) { // if it's within two moves of the start, just give it a break
+                lastCheckedHeadingLookbackMove = lastCheckedHeadingLookbackMove.parent;
+
+                double headingLookbackDistance = Math.sqrt(Math.pow(move.x - lastCheckedHeadingLookbackMove.x, 2) + Math.pow(move.y - lastCheckedHeadingLookbackMove.y, 2));
+                inertialHeading = (int) Math.toDegrees(Math.atan2(move.y - lastCheckedHeadingLookbackMove.y, move.x - lastCheckedHeadingLookbackMove.x));
+
+                while (headingLookbackDistance < 2) {
+                    lastCheckedHeadingLookbackMove = lastCheckedHeadingLookbackMove.parent;
+                    headingLookbackDistance += Math.sqrt(Math.pow(move.x - lastCheckedHeadingLookbackMove.x, 2) + Math.pow(move.y - lastCheckedHeadingLookbackMove.y, 2));
+                    inertialHeading = (int) Math.toDegrees(Math.atan2(move.y - lastCheckedHeadingLookbackMove.y, move.x - lastCheckedHeadingLookbackMove.x));
+                }
+            }*/
+
+            // other way of calculating inertial heading, just use the parent's inertial heading
+            int inertialHeading = Integer.MIN_VALUE;
+            if(move.parent != null) {
+                inertialHeading = (int) Math.toDegrees(Math.atan2(move.y - move.parent.y, move.x - move.parent.x));
+            }
+
+
             // add all adjacent nodes
-            if(move.x > 0) {
-                if(!visited[move.x - 1][move.y]) {
-                    moves.add(new Path(move.x - 1, move.y, move.cost + 1, move));
-                    visited[move.x - 1][move.y] = true;
+            for(RobotTranslation translation : validTranslations) {
+                int newX = move.x + translation.x;
+                int newY = move.y + translation.y;
+                if(newX < 0 || newY < 0 || newX >= grid.getPointsWide() || newY >= grid.getPointsTall()) {
+                    continue;
                 }
-            }
-            if(move.x + 1 < grid.getPointsWide()) {
-                if(!visited[move.x + 1][move.y]) {
-                    moves.add(new Path(move.x + 1, move.y, move.cost + 1, move));
-                    visited[move.x + 1][move.y] = true;
-                }
-            }
-            if(move.y > 0) {
-                if(!visited[move.x][move.y - 1]) {
-                    moves.add(new Path(move.x, move.y - 1, move.cost + 1, move));
-                    visited[move.x][move.y - 1] = true;
-                    moves.add(new Path(move.x, move.y - 1, move.cost + 1, move));
-                }
-            }
-            if(move.y + 1 < grid.getPointsTall()) {
-                if(!visited[move.x][move.y + 1]) {
-                    moves.add(new Path(move.x, move.y + 1, move.cost + 1, move));
-                    visited[move.x][move.y + 1] = true;
-                }
-            }
-            if(move.x > 0 && move.y > 0) {
-                if(!visited[move.x - 1][move.y - 1]) {
-                    moves.add(new Path(move.x - 1, move.y - 1, move.cost + Math.sqrt(2.0d), move));
-                    visited[move.x - 1][move.y - 1] = true;
-                }
-            }
-            if(move.x + 1 < grid.getPointsWide() && move.y > 0) {
-                if(!visited[move.x + 1][move.y - 1]) {
-                    moves.add(new Path(move.x + 1, move.y - 1, move.cost + Math.sqrt(2.0d), move));
-                    visited[move.x + 1][move.y - 1] = true;
-                }
-            }
-            if(move.x > 0 && move.y + 1 < grid.getPointsTall()) {
-                if(!visited[move.x - 1][move.y + 1]) {
-                    moves.add(new Path(move.x - 1, move.y + 1, move.cost + Math.sqrt(2.0d), move));
-                    visited[move.x - 1][move.y + 1] = true;
-                }
-            }
-            if(move.x + 1 < grid.getPointsWide() && move.y + 1 < grid.getPointsTall()) {
-                if(!visited[move.x + 1][move.y + 1]) {
-                    moves.add(new Path(move.x + 1, move.y + 1, move.cost + Math.sqrt(2.0d), move));
-                    visited[move.x + 1][move.y + 1] = true;
+                if(!visited[newX][newY]) {
+                    // calculate penalty for turning
+                    int headingChange = inertialHeading != Integer.MIN_VALUE ? (Math.abs(inertialHeading - translation.heading)) : 0;
+                    //int headingChange = 0; //temporarily disable for debugging
+                    moves.add(new Path(newX, newY, move.cost + translation.cost + (headingChange/360.0d), move));
                 }
             }
         }
@@ -100,8 +121,8 @@ public class Pathfinder {
         }
 
         @Override
-        public int compareTo(Path o) {
-            return Double.compare(cost, o.cost); //TODO: make it equals-consistent
+        public int compareTo(Path o) { //note:
+            return Float.compare((float) cost, (float) o.cost); //TODO: make it equals-consistent
         }
     }
 }
