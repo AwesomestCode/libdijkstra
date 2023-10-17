@@ -64,6 +64,7 @@ public class Pathfinder {
                     grid.getGrid()[current.x][current.y].setState(Grid.GridPointState.PATH);
                     current = current.parent;
                 }
+                move.coalesce();
                 return move;
             }
             // calculate inertial heading by using current position and position two lattice points ago
@@ -128,13 +129,36 @@ public class Pathfinder {
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
-            builder.append(this.hashCode());
+            builder.append("Pathfinder.Path:").append(this.hashCode()).append("\n");
             Path point = this;
             while(point != null) {
                 builder.append("\t(").append(point.x).append(", ").append(point.y).append(")\n");
                 point = point.parent;
             }
             return builder.toString();
+        }
+
+        /**
+         * Coalesces this path so that if two line segments are collinear, they are merged into one line segment
+         */
+        public void coalesce() {
+            Path checkingPoint = this;
+            // check if the parent point lies on the line segment between this point and the grandparent.
+            // if so, set the parent to the grandparent and repeat
+            while(checkingPoint.parent != null && checkingPoint.parent.parent != null) {
+                if(
+                        Math.abs(
+                                ((double) (checkingPoint.parent.y - checkingPoint.y)/(checkingPoint.parent.x - checkingPoint.x)
+                              - ((double) checkingPoint.parent.parent.y - checkingPoint.y)/(checkingPoint.parent.parent.x - checkingPoint.x))) < 1E-9
+                        ||
+                                (checkingPoint.parent.x == checkingPoint.x && checkingPoint.parent.parent.x == checkingPoint.x) // if the x values are the same, they're collinear, this is a special case since both slopes are infinite and the difference is thus NaN
+                ) {
+                    checkingPoint.parent = checkingPoint.parent.parent;
+//                    System.out.println("coalesced " + checkingPoint.x + ", " + checkingPoint.y + " with " + checkingPoint.parent.x + ", " + checkingPoint.parent.y + " and " + checkingPoint.parent.parent.x + ", " + checkingPoint.parent.parent.y);
+                } else {
+                    checkingPoint = checkingPoint.parent;
+                }
+            }
         }
     }
 }
