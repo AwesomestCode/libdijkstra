@@ -1,6 +1,6 @@
-package io.github.awesomestcode.compute;
+package io.github.awesomestcode.libdijkstra.compute;
 
-import io.github.awesomestcode.common.Grid;
+import io.github.awesomestcode.libdijkstra.common.Grid;
 import org.junit.jupiter.api.Test;
 
 class PathfinderPerformanceTest {

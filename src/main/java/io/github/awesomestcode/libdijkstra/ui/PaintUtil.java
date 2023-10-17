@@ -1,7 +1,7 @@
-package io.github.awesomestcode.ui;
+package io.github.awesomestcode.libdijkstra.ui;
 
-import io.github.awesomestcode.common.Grid;
-import io.github.awesomestcode.compute.Pathfinder;
+import io.github.awesomestcode.libdijkstra.common.Grid;
+import io.github.awesomestcode.libdijkstra.compute.Pathfinder;
 
 import java.awt.*;
 

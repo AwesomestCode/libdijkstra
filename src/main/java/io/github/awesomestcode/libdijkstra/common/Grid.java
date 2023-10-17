@@ -1,4 +1,4 @@
-package io.github.awesomestcode.common;
+package io.github.awesomestcode.libdijkstra.common;
 
 /**
  * Used to represent a grid of nodes

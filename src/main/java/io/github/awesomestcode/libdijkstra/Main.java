@@ -1,15 +1,14 @@
-package io.github.awesomestcode;
+package io.github.awesomestcode.libdijkstra;
 
-import io.github.awesomestcode.common.Grid;
-import io.github.awesomestcode.compute.Pathfinder;
-import io.github.awesomestcode.ui.GUIPanel;
-import io.github.awesomestcode.ui.PaintUtil;
+import io.github.awesomestcode.libdijkstra.common.Grid;
+import io.github.awesomestcode.libdijkstra.compute.Pathfinder;
+import io.github.awesomestcode.libdijkstra.ui.GUIPanel;
 
 import javax.swing.JFrame;
 
 public class Main {
     static GUIPanel panel = null;
-    private static final int GRID_SIZE = 6 * 64;
+    private static final int GRID_SIZE = 64;
     private static int startX = 0;
     private static int startY = 0;
     private static int endX = GRID_SIZE - 1;
@@ -34,10 +33,10 @@ public class Main {
                 }
             }
         }
-        //createAndShowGUI();
+        createAndShowGUI();
 
         Pathfinder.Path path = Pathfinder.search(startX, startY, endX, endY, grid);
-        //panel.setPath(path);
+        panel.setPath(path);
         //todo: trigger repaint
 
     }
@@ -76,6 +75,7 @@ public class Main {
         grid.clearPathStates();
         Pathfinder.Path path = Pathfinder.search(startX, startY, endX, endY, grid);
         panel.setPath(path);
+        System.out.println(path);
     }
 
     public static void setEndXY(int endX, int endY) {
@@ -84,6 +84,7 @@ public class Main {
         grid.clearPathStates();
         Pathfinder.Path path = Pathfinder.search(startX, startY, endX, endY, grid);
         panel.setPath(path);
+        System.out.println(path);
     }
 
     private static boolean isBlocked(int x, int y) {

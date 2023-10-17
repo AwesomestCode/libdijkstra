@@ -1,7 +1,7 @@
-package io.github.awesomestcode.compute;
+package io.github.awesomestcode.libdijkstra.compute;
 
-import io.github.awesomestcode.common.Grid;
-import io.github.awesomestcode.ui.RobotTranslation;
+import io.github.awesomestcode.libdijkstra.common.Grid;
+import io.github.awesomestcode.libdijkstra.ui.RobotTranslation;
 
 import java.util.PriorityQueue;
 
@@ -108,7 +108,7 @@ public class Pathfinder {
         throw new RuntimeException("no path found");
     }
 
-    public static class Path implements Comparable<Path>{
+    public static class Path implements Comparable<Path> {
         public int x;
         public int y;
         public double cost;
@@ -123,6 +123,18 @@ public class Pathfinder {
         @Override
         public int compareTo(Path o) { //note:
             return Float.compare((float) cost, (float) o.cost); //TODO: make it equals-consistent
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append(this.hashCode());
+            Path point = this;
+            while(point != null) {
+                builder.append("\t(").append(point.x).append(", ").append(point.y).append(")\n");
+                point = point.parent;
+            }
+            return builder.toString();
         }
     }
 }

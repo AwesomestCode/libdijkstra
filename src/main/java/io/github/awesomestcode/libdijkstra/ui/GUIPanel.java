@@ -1,8 +1,8 @@
-package io.github.awesomestcode.ui;
+package io.github.awesomestcode.libdijkstra.ui;
 
-import io.github.awesomestcode.Main;
-import io.github.awesomestcode.common.Grid;
-import io.github.awesomestcode.compute.Pathfinder;
+import io.github.awesomestcode.libdijkstra.Main;
+import io.github.awesomestcode.libdijkstra.common.Grid;
+import io.github.awesomestcode.libdijkstra.compute.Pathfinder;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -10,9 +10,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.BiPredicate;
-
-import static io.github.awesomestcode.ui.PaintUtil.paintPath;
 
 public class GUIPanel extends JPanel {
 
@@ -27,7 +26,10 @@ public class GUIPanel extends JPanel {
 
     {
         try {
-            bgImg = ImageIO.read(new File("/Users/owl/Downloads/field-2022-kai-dark.png"));
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            InputStream is = classloader.getResourceAsStream("field-2023-juice-dark.png");
+            assert is != null;
+            bgImg = ImageIO.read(is);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -116,7 +118,7 @@ public class GUIPanel extends JPanel {
         }
 
         refreshEllipses(g);
-        if(path != null) paintPath(path, grid, g);
+        if(path != null) PaintUtil.paintPath(path, grid, g);
         this.requestFocus();
 
     }

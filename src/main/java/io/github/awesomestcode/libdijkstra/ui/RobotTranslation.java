@@ -1,4 +1,4 @@
-package io.github.awesomestcode.ui;
+package io.github.awesomestcode.libdijkstra.ui;
 
 public class RobotTranslation {
     public final int x;
