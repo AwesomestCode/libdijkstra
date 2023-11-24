@@ -39,7 +39,7 @@ public class Grid {
         for(int i = 0; i < pointsWide; i++) {
             for(int j = 0; j < pointsTall; j++) {
                 try {
-                    grid[i][j] = new GridPoint(i, j);
+                    grid[i][j] = new GridPoint(i, j, this);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -99,13 +99,30 @@ public class Grid {
             this.state = state;
         }
 
-        public GridPoint(int x, int y) {
+        public GridPoint(int x, int y, Grid parentGrid) {
             this.x = x;
             this.y = y;
+            this.parentGrid = parentGrid;
         }
+
+        private final Grid parentGrid;
 
         public boolean isPartOfPath() {
             return state == GridPointState.PATH || state == GridPointState.START || state == GridPointState.END;
+        }
+
+        /**
+         * @return the x coordinate of this point in inches. Origin is middle of field
+         */
+        public int getXInches() {
+            return GridPositionUtil.getXInches(x, parentGrid);
+        }
+
+        /**
+         * @return the y coordinate of this point in inches. Origin is middle of field
+         */
+        public int getYInches() {
+            return GridPositionUtil.getYInches(y, parentGrid);
         }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.awesomestcode.libdijkstra.compute;
 
 import io.github.awesomestcode.libdijkstra.common.Grid;
+import io.github.awesomestcode.libdijkstra.common.GridPositionUtil;
 import io.github.awesomestcode.libdijkstra.ui.RobotTranslation;
 
 import java.util.PriorityQueue;
@@ -44,7 +45,7 @@ public class Pathfinder {
         boolean[][] visited = new boolean[grid.getPointsWide()][grid.getPointsTall()];
         //visited[startX][startY] = true;
         PriorityQueue<Path> moves = new PriorityQueue<>();
-        moves.add(new Path(startX, startY, 0, null));
+        moves.add(new Path(startX, startY, 0, null, grid));
         while(!moves.isEmpty()) {
             Path move = moves.poll();
 
@@ -102,7 +103,7 @@ public class Pathfinder {
                     // calculate penalty for turning
                     int headingChange = inertialHeading != Integer.MIN_VALUE ? (Math.abs(inertialHeading - translation.heading)) : 0;
                     //int headingChange = 0; //temporarily disable for debugging
-                    moves.add(new Path(newX, newY, move.cost + translation.cost + (headingChange/360.0d), move));
+                    moves.add(new Path(newX, newY, move.cost + translation.cost + (headingChange/360.0d), move, grid));
                 }
             }
         }
@@ -114,11 +115,13 @@ public class Pathfinder {
         public int y;
         public double cost;
         public Path parent;
-        public Path(int x, int y, double cost, Path parent) {
+        public final Grid parentGrid;
+        public Path(int x, int y, double cost, Path parent, Grid parentGrid) {
             this.x = x;
             this.y = y;
             this.cost = cost;
             this.parent = parent;
+            this.parentGrid = parentGrid;
         }
 
         @Override
@@ -159,6 +162,13 @@ public class Pathfinder {
                     checkingPoint = checkingPoint.parent;
                 }
             }
+        }
+        public int getXInches() {
+            return GridPositionUtil.getXInches(x, parentGrid);
+        }
+
+        public int getYInches() {
+            return GridPositionUtil.getYInches(y, parentGrid);
         }
     }
 }

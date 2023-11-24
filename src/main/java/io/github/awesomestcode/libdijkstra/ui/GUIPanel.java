@@ -11,7 +11,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class GUIPanel extends JPanel {
 
@@ -19,7 +19,7 @@ public class GUIPanel extends JPanel {
 
     private final Image bgImg;
 
-    private final BiPredicate<Integer, Integer> isBlocked;
+    private final Predicate<Grid.GridPoint> isBlocked;
 
     private final Grid grid;
     private Pathfinder.Path path;
@@ -35,7 +35,7 @@ public class GUIPanel extends JPanel {
         }
     }
 
-    public GUIPanel(BiPredicate<Integer, Integer> isBlocked, Grid grid) {
+    public GUIPanel(Predicate<Grid.GridPoint> isBlocked, Grid grid) {
         this.grid = grid;
         this.isBlocked = isBlocked;
 
@@ -114,6 +114,7 @@ public class GUIPanel extends JPanel {
         Grid.GridPoint gp = grid.getNearestGridPoint((location.x - this.getLocationOnScreen().x), (location.y - this.getLocationOnScreen().y));
         if(gp != null) {
             gp.setActive(true);
+            g.drawString("Inches X: " + gp.getXInches() + " Y: " + gp.getYInches(), 10, 40);
             //System.out.println("x: " + gp.x + " y: " + gp.y);
         }
 
@@ -134,7 +135,7 @@ public class GUIPanel extends JPanel {
             for(int j = 0; j < grid.getPointsWide(); j++) {
                 PaintUtil.paintEllipse(grid, points[i][j], g);
                 // check if blocked
-                if(isBlocked.test(i, j)) { //TODO: move this logic to common
+                if(isBlocked.test(points[i][j])) { //TODO: move this logic to common
                     points[i][j].setState(Grid.GridPointState.BLOCKED);
                 } else if(!points[i][j].isPartOfPath()){
                     points[i][j].setState(Grid.GridPointState.UNBLOCKED);
